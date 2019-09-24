@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.*
 @RestController
 class MessageController(private val kafkaTemplate: KafkaTemplate<Int, String>) {
 
-    @GetMapping("/publishMessages")
-    fun publishMessagesInBatch(@RequestParam(value = "batchSize", required = true) batchSize: Int) {
+    @GetMapping("/{topic}/publishMessages")
+    fun publishMessagesInBatch(@PathVariable("topic", required = true )topic: String, @RequestParam(value = "batchSize", required = true) batchSize: Int) {
         for (x in 0..batchSize) {
-            this.kafkaTemplate.send("numbers", ObjectMapper().writeValueAsString(Message("This is $x message", x)))
+            this.kafkaTemplate.send(topic, ObjectMapper().writeValueAsString(Message("This is $x message", x)))
         }
     }
 

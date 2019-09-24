@@ -17,20 +17,20 @@ fun main() {
     kafkaParams["key.deserializer"] = StringDeserializer::class.java
     kafkaParams["value.deserializer"] = StringDeserializer::class.java
     kafkaParams["group.id"] = "NumbersGroup"
-    kafkaParams["auto.offset.reset"] = "latest"
+    kafkaParams["auto.offset.reset"] = "earliest"
     kafkaParams["enable.auto.commit"] = false
 
     val sparkConf = SparkConf().setAppName("NumberStream").setMaster("local[*]")
     sparkConf.set("spark.streaming.backpressure.enable", "true")
-    sparkConf.set("spark.streaming.kafka.maxRatePerPartition", "2000")
+    sparkConf.set("spark.streaming.kafka.maxRatePerPartition", "10")
     sparkConf.set("spark.serializer", "org.apache.spark.serializer.KyroSerializer")
 
     sparkConf.registerKryoClasses(arrayOf(ConsumerRecord::class.java))
 
-    JavaStreamingContext(sparkConf, Durations.seconds(2)).use { jsc ->
+    JavaStreamingContext(sparkConf, Durations.milliseconds(500)).use { jsc ->
 
         val fromOffsets = HashMap<TopicPartition, Long>()
-        fromOffsets[TopicPartition("numbers",0)] = 0L
+        fromOffsets[TopicPartition("numbers",229)] = 0L
 
         val offsetRanges = AtomicReference<Array<OffsetRange>>()
 
